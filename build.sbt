@@ -13,14 +13,17 @@ lazy val defaultSettings = Defaults.itSettings ++
   sbtScalariform.settings ++
   sbtWartremover.settings ++
   scalacOptions.settings ++
+  Dependencies.overrides ++
   Seq(
     CommonResolvers.settings,
     Dependencies.base, Dependencies.scalatest,
     retrieveManaged := true,
     publishMavenStyle := true,
+    conflictManager in ThisBuild := ConflictManager.latestCompatible,
     Version.set("0.1", Version.SNAPSHOT),
     scalaVersion in ThisBuild := Versions.scala211,
-    crossScalaVersions in ThisBuild := Seq(Versions.scala210, Versions.scala211),
+    // unclear how to combine below with 'Dependencies.overrides'
+    // crossScalaVersions in ThisBuild := Seq(Versions.scala210, Versions.scala211),
     fork in Test := true,
     // Show current project name in the SBT prompt, e.g. `predef>`
     shellPrompt in ThisBuild := { state =>

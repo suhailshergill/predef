@@ -19,7 +19,7 @@ object Dependencies {
 
   lazy val `org.scala-lang:scala-reflect` =
     "org.scala-lang" % "scala-reflect" % Versions.scala211
-  lazy val `com.chuusai:shapeless` = "com.chuusai" %% "shapeless" % "2.2.0"
+  lazy val `com.chuusai:shapeless` = "com.chuusai" %% "shapeless" % "2.2.4"
   lazy val `org.typelevel:shapeless-spire` =
     "org.typelevel" %% "shapeless-spire" % Versions.shapelessContrib
   lazy val `org.typelevel:cats` = "org.typelevel" %% "cats" % "0.4.1"
@@ -69,7 +69,7 @@ object Dependencies {
     `org.scalatest:scalatest`
     , `org.scalactic:scalactic`
     , `org.scalacheck:scalacheck`
-    , `com.github.alexarchambault:scalacheck-shapeless`
+    // , `com.github.alexarchambault:scalacheck-shapeless`
   )
 
   lazy val base: Def.Setting[_] = libraryDependencies ++= Seq(
@@ -89,6 +89,11 @@ object Dependencies {
     , `org.apache.spark:spark-streaming`
     , `org.apache.spark:spark-mllib`
     , `org.apache.spark:spark-sql`
+  )
+
+  lazy val overrides: Seq[Setting[_]] = Seq(
+    dependencyOverrides += "org.scala-lang" % "scala-compiler" % Versions.scala211
+    , dependencyOverrides += "org.scala-lang" % "scala-library" % Versions.scala211
   )
 
 }
