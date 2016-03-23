@@ -8,7 +8,7 @@ jdk:
   - openjdk7
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION 'test-only * -- exclude slow'
+  - travis_retry sbt ++$TRAVIS_SCALA_VERSION 'test-only * -- -l sss.tags.SlowTest'
 
 notifications:
   webhooks:
