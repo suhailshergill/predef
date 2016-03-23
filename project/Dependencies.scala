@@ -77,7 +77,7 @@ object Dependencies {
     , `com.chuusai:shapeless`
     , `org.typelevel:shapeless-spire`
     , `org.typelevel:cats`
-    , `org.specs2:eff-cats`
+    // , `org.specs2:eff-cats`
     , `com.github.mpilquist:simulacrum`
     , `org.typelevel:discipline`
   )
