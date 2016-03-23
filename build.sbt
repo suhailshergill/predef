@@ -14,6 +14,7 @@ lazy val defaultSettings = Defaults.itSettings ++
   sbtWartremover.settings ++
   scalacOptions.settings ++
   Seq(
+    CommonResolvers.settings,
     Dependencies.base, Dependencies.scalatest,
     retrieveManaged := true,
     publishMavenStyle := true,
