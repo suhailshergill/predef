@@ -17,7 +17,7 @@ class FixTest extends FreeSpec {
 
   "A Fixpoint operator should" - {
     "not blow the stack" - {
-      "Fix.apply" in {
+      "Fix.apply" taggedAs (SlowTest) in {
         import Fix.instances._
         // <http://eed3si9n.com/herding-cats/stackless-scala-with-free-monads.html>
         def acktabs(ack: ((Int, Int)) => Fix.T[Int])(in: (Int, Int)): Fix.T[Int] = {
@@ -33,7 +33,7 @@ class FixTest extends FreeSpec {
           Fix(acktabs)(alot).run
         }
       }
-      "Fix.exception" in pendingUntilFixed {
+      "Fix.exception" taggedAs (SlowTest) in pendingUntilFixed {
         try {
           verifyResult {
             Fix.Exception(acktabs)(alot)
@@ -42,7 +42,7 @@ class FixTest extends FreeSpec {
           case _: StackOverflowError => fail()
         }
       }
-      "Fix.fixSimple" in pendingUntilFixed {
+      "Fix.fixSimple" taggedAs (SlowTest) in pendingUntilFixed {
         try {
           verifyResult {
             Fix.fixSimple(acktabs)(alot)
