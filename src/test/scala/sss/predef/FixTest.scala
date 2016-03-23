@@ -3,6 +3,9 @@ package sss.predef
 import sss.tags._
 import org.scalatest._
 
+// suppress deprecation warnings over narrow scope
+// <https://issues.scala-lang.org/browse/SI-7934>
+@deprecated("", "")
 class FixTest extends FreeSpec {
   // en.wikipedia.org/wiki/Ackermann_function
   def acktabs(ack: ((Int, Int)) => Int)(in: (Int, Int)): Int = {

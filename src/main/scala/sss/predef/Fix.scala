@@ -13,7 +13,7 @@ object Fix {
     f((x: A) => Fix(f)(x))
   }
 
-  // not @tailrec
+  @deprecated("This function is not stack-safe", "forever")
   def fixSimple[A, B](f: (A => B) => (A => B)): A => B = {
     f((x: A) => fixSimple(f)(x))
   }
@@ -27,6 +27,7 @@ object Fix {
   // creating a 'Fix' object?)
   object Exception {
     case class FixException() extends RuntimeException
+    @deprecated("This function is not stack-safe", "forever")
     @tailrec final def apply[A, B](f: (A => B) => (A => B))(x: A): B = try {
       f(_ => throw FixException())(x)
     } catch {
