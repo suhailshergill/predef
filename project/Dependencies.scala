@@ -29,7 +29,7 @@ object Dependencies {
   lazy val `org.typelevel:discipline` = "org.typelevel" %% "discipline" % "0.4"
 
 
-  lazy val `org.spire-math:spire` = "org.spire-math" %% "spire" % "0.8.2"
+  lazy val `org.spire-math:spire` = "org.spire-math" %% "spire" % "0.11.0"
   lazy val `org.apache.spark:spark-core` =
     "org.apache.spark" %% "spark-core" % Versions.spark excludeSparkDependencies()
   lazy val `org.apache.spark:spark-streaming` =
@@ -75,7 +75,8 @@ object Dependencies {
   lazy val base: Def.Setting[_] = libraryDependencies ++= Seq(
     `org.scala-lang:scala-reflect`
     , `com.chuusai:shapeless`
-    , `org.typelevel:shapeless-spire`
+    // `org.typelevel:shapeless-spire` conflicts with recent version of spire
+    // , `org.typelevel:shapeless-spire`
     , `org.typelevel:cats`
     // , `org.specs2:eff-cats`
     , `com.github.mpilquist:simulacrum`
