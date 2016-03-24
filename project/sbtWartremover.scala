@@ -9,7 +9,10 @@ object sbtWartremover {
     // disable Wart.Throw till
     // <https://github.com/puffnfresh/wartremover/issues/182> lands in the
     // upcoming release
-    wartremoverErrors ++= Warts.unsafe filterNot (_ == Wart.Throw)
+    wartremoverErrors ++= (Warts.unsafe filterNot (_ == Wart.Throw)) ++ Seq(
+      Wart.ExplicitImplicitTypes
+      , Wart.FinalCaseClass
+    )
   )
 
 }
