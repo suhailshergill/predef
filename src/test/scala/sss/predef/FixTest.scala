@@ -7,33 +7,50 @@ import org.scalatest._
 // <https://issues.scala-lang.org/browse/SI-7934>
 @deprecated("", "")
 class FixTest extends FreeSpec {
-  // en.wikipedia.org/wiki/Ackermann_function
-  def acktabs(ack: ((Int, Int)) => Int)(in: (Int, Int)): Int = {
-    val (m, n) = in
-    if (m <= 0) n + 1
-    else if (n <= 0) ack((m - 1, 1))
-    else ack((m - 1, ack((m, n - 1))))
-  }
-
-  val alot = (3, 12)
-  def verifyResult(actual: Any): Unit = assertResult(32765)(actual)
 
   "A Fixpoint operator should" - {
     "not blow the stack" - {
-      "Fix.apply" taggedAs (SlowTest) in {
-        import Fix.instances._
+      // we'll use the ackermann function as testcase
+      // <https://en.wikipedia.org/wiki/Ackermann_function>
+      def acktabs(ack: ((Int, Int)) => Int)(in: (Int, Int)): Int = {
+        val (m, n) = in
+        if (m <= 0) n + 1
+        else if (n <= 0) ack((m - 1, 1))
+        else ack((m - 1, ack((m, n - 1))))
+      }
+      val alot = (3, 12)
+      def verifyResult(actual: Any): Unit = assertResult(32765)(actual)
+
+      "Fix.apply" - {
+        import Fix._
+
+        // for the generic interface we need to transform our recursive
+        // definition to use our recursion primitives. this is similar in spirit
+        // to the idea presented in
         // <http://eed3si9n.com/herding-cats/stackless-scala-with-free-monads.html>
-        def acktabs(ack: ((Int, Int)) => Fix.T[Int])(in: (Int, Int)): Fix.T[Int] = {
+        def acktabs[T[_]: Sym](ack: ((Int, Int)) => T[Int])(in: (Int, Int)): T[Int] = {
+          // bring the DSL into scope
+          val e1 = implicitly[Sym[T]]
+          import e1._
+          // define the computation
           val (m, n) = in
-          if (m <= 0) Fix.T.done(n + 1)
-          else if (n <= 0) Fix.T.suspend(ack((m - 1, 1)))
+          if (m <= 0) done(n + 1)
+          else if (n <= 0) suspend(ack((m - 1, 1)))
           else for {
-            a <- Fix.T.suspend(ack((m, n - 1)))
-            b <- Fix.T.suspend(ack((m - 1, a)))
+            a <- suspend(ack((m, n - 1)))
+            b <- suspend(ack((m - 1, a)))
           } yield b
         }
-        verifyResult {
-          Fix(acktabs)(alot).run
+
+        "Fix[Trampoline]" taggedAs (SlowTest) in {
+          verifyResult {
+            Fix(acktabs[Trampoline]).apply(alot).recurse
+          }
+        }
+        "Fix[TailRec]" taggedAs (SlowTest) in {
+          verifyResult {
+            Fix(acktabs[TailRec]).apply(alot).recurse
+          }
         }
       }
       "Fix.exception" taggedAs (SlowTest) in pendingUntilFixed {
