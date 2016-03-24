@@ -91,9 +91,9 @@ object Dependencies {
     , `org.apache.spark:spark-sql`
   )
 
-  lazy val overrides: Seq[Setting[_]] = Seq(
-    dependencyOverrides += "org.scala-lang" % "scala-compiler" % Versions.scala211
-    , dependencyOverrides += "org.scala-lang" % "scala-library" % Versions.scala211
+  lazy val overrides: Seq[Setting[_]] = dependencyOverrides ++= Set(
+    "org.scala-lang" % "scala-compiler" % Versions.scala211
+    , "org.scala-lang" % "scala-library" % Versions.scala211
   )
 
 }
