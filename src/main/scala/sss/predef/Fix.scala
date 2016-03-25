@@ -1,23 +1,37 @@
 package sss.predef
 
+/**
+  * generic stack-safe recursive computations. see 'Fix.Sym' for the DSL used to
+  * define said computations. see 'Fix.apply' to see how to run such
+  * computations.
+  */
 object Fix {
   import cats._
 
   /**
     * DSL for defining recursive computations
     */
-  abstract class Sym[T[_]: Monad] extends syntax.AllSyntax {
+  abstract class Sym[T[_]: Monad] extends syntax.AllSyntax { self =>
     type τ[A] = T[A]
 
     def done[A]: A => τ[A]
     def suspend[A](ta: => τ[A]): τ[A]
-    def run[A](ta: => τ[A]): A
+    /**
+      * 'run' is private to ensure that we can control access to
+      * it. specifically, the only way to 'run' a recursive computation is via
+      * 'FixOps.recurse' whose construction is only possible via 'Fix.apply'.
+      *
+      *  why do we care? because we want to make it harder to accidentally use
+      *  'run' in the process of describing/defining a recursive computation (or
+      *  it detracts from the stack-safety).
+      */
+    private[Fix] def run[A](ta: => τ[A]): A
 
     /**
       * the implicit definition here allows us to use 'suspend' in for
-      * comprehensions. interestingly, however things breakdown if we explicitly
-      * type it, because the compiler tries to resolve it using itself
-      * ("ambiguous implicit values")
+      * comprehensions. interestingly, however, things breakdown if we
+      * explicitly type it, because the compiler tries to resolve it using
+      * itself ("ambiguous implicit values")
       */
     @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.ExplicitImplicitTypes"))
     implicit def monadInstance = implicitly[Monad[T]]
@@ -29,20 +43,25 @@ object Fix {
     def done[T[_]: Sym]: T[A] = implicitly[Sym[T]].done(x)
   }
   /**
-    * below allows us to use _.recurse to run the computation. we we explicitly
-    * don't want to have 'suspend' here because it detracts from the
-    * stack-safety of the interpretors
+    * the only way to construct a 'FixOps' instance is using 'Fix.apply', and
+    * the only thing you can do with the 'FixOps' instance is to call
+    * '_.recurse' (which runs the recursive computation)
     */
-  implicit final class SymOps[T[_]: Sym, A](x: T[A]) {
+  final case class FixOps[T[_]: Sym, A] private[Fix] (private val x: T[A]) {
     def recurse: A = implicitly[Sym[T]].run(x)
   }
 
   /**
     * generic fixpoint operator. this operator is stack-safe modulo the
-    * stack-safety of the interpreters
+    * stack-safety of the interpreters. additionally, the return type ensures
+    * that the only thing you can do with the result is to call 'recurse' on it
     */
-  final def apply[T[_], A, B](f: (A => T[B]) => (A => T[B]))(implicit e1: Sym[T]): A => T[B] = {
-    f((x: A) => Fix(f)(e1)(x))
+  final def apply[T[_]: Sym, A, B](f: (A => T[B]) => (A => T[B])): A => FixOps[T, B] = {
+    def fix(f: (A => T[B]) => (A => T[B]))(implicit e1: Sym[T]): A => T[B] = {
+      f((x: A) => fix(f)(e1)(x))
+    }
+    // call the fixpoint function and then wrap it in a FixOps instance
+    fix(f) andThen FixOps[T, B]
   }
 
   // {{{ recursive interpreters
