@@ -1,5 +1,20 @@
 package sss.predef
 
+/*
+abstract class Sym[T[_] >: [_]Nothing <: [_]Any] extends AnyRef with cats.syntax.AllSyntax { self: sss.predef.Fix.Sym[T] =>
+      implicit <synthetic> <paramaccessor> private[this] val evidence$1: cats.Monad[T] = _;
+      def <init>()(implicit evidence$1: cats.Monad[T]): sss.predef.Fix.Sym[T] = {
+        Sym.super{Sym.super.type}.<init>{()Object}(){Object};
+        (){Unit}
+      }{Unit};
+      type τ[A] = T[A];
+      def done[A]: A => Sym.this.τ[A];
+      def suspend[A](ta: => Sym.this.τ[A]): Sym.this.τ[A];
+      private[Fix] def run[A](ta: => Sym.this.τ[A]): A;
+      @SuppressWarnings(value = ["org.brianmckenna.wartremover.warts.ExplicitImplicitTypes"]) implicit def monadInstance: cats.Monad[T] = scala.this{scala.type}.Predef.implicitly{[T](implicit e: T)T}[cats.Monad[T]]{(implicit e: cats.Monad[T])cats.Monad[T]}(Sym.this{Sym.this.type}.evidence$1{cats.Monad[T]}){cats.Monad[T]}
+    };
+ */
+
 /**
   * generic stack-safe recursive computations. see 'Fix.Sym' for the DSL used to
   * define said computations. see 'Fix.apply' to see how to run such
@@ -11,7 +26,8 @@ object Fix {
   /**
     * DSL for defining recursive computations
     */
-  abstract class Sym[T[_]: Monad] extends syntax.AllSyntax { self =>
+  @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.ExplicitImplicitTypes"))
+  abstract class Sym[T[_]](implicit m: Monad[T]) extends syntax.AllSyntax { self =>
     type τ[A] = T[A]
 
     def done[A]: A => τ[A]
