@@ -33,7 +33,7 @@ object Fix {
       * scope.
       */
     @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.ExplicitImplicitTypes"))
-    implicit def monadInstance = m
+    implicit def monadInstance = implicitly[Monad[T]]
   }
   /**
     * below allows us to use something like x.done[T] for some Sym[T]
