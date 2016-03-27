@@ -11,7 +11,7 @@ object Fix {
   /**
     * DSL for defining recursive computations
     */
-  abstract class Sym[T[_]](implicit val m: Monad[T]) extends syntax.AllSyntax { self =>
+  abstract class Sym[T[_]: Monad] extends syntax.AllSyntax { self =>
     type τ[A] = T[A]
 
     def done[A]: A => τ[A]
@@ -32,7 +32,8 @@ object Fix {
       * comprehensions, by bringing the elements of pertinent 'Sym[T]' into
       * scope.
       */
-    implicit def monadInstance: Monad[τ] = m
+    @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.ExplicitImplicitTypes"))
+    implicit def monadInstance = implicitly[Monad[T]]
   }
   /**
     * below allows us to use something like x.done[T] for some Sym[T]
