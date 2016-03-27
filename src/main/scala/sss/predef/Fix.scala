@@ -11,7 +11,7 @@ object Fix {
   /**
     * DSL for defining recursive computations
     */
-  abstract class Sym[T[_]](implicit val m: Monad[T]) extends syntax.AllSyntax { self =>
+  abstract class Sym[T[_]]()(implicit val m: Monad[T]) extends syntax.AllSyntax { self =>
     type τ[A] = T[A]
 
     def done[A]: A => τ[A]
