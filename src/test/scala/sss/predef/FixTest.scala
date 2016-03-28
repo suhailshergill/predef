@@ -6,7 +6,10 @@ import org.scalatest._
 // suppress deprecation warnings over narrow scope
 // <https://issues.scala-lang.org/browse/SI-7934>
 @deprecated("", "")
-class FixTest extends FreeSpec {
+class FixTest extends FreeSpec
+    with prop.GeneratorDrivenPropertyChecks
+    with ShouldMatchers {
+  import Fix._
 
   "A Fixpoint operator should" - {
     "not blow the stack" - {
@@ -22,8 +25,6 @@ class FixTest extends FreeSpec {
       def verifyResult(actual: Any): Unit = assertResult(32765)(actual)
 
       "Fix.apply" - {
-        import Fix._
-
         // for the generic interface we need to transform our recursive
         // definition to use our recursion primitives. this is similar in spirit
         // to the idea presented in
@@ -69,6 +70,44 @@ class FixTest extends FreeSpec {
           }
         } catch {
           case _: StackOverflowError => fail()
+        }
+      }
+    }
+
+    "find the fixpoint" - {
+      object Factorial {
+        // define a recursive function in the 'open recursive' style. notice the
+        // 'self' argument
+        def fac_[T[_]: Sym](self: Long => T[BigInt])(x: Long): T[BigInt] = {
+          val e1 = implicitly[Sym[T]]
+          import e1._
+          x match {
+            case 0 => done(1)
+            case 1 => done(1)
+            case x => for {
+              y <- suspend(self(x - 1))
+            } yield (x * y)
+          }
+        }
+
+        // close the recursion using fixpoint operator
+        def apply[T[_]: Sym](x: Long): FixOps[T, BigInt] = Fix(fac_[T]) apply x
+      }
+      "Factorial should calculate n!" - {
+        import org.scalacheck._
+        val positiveLongs = for (n <- Gen.choose(0L, 15L)) yield n
+        def checkFactorial[T[_]: Sym](fac: Long => FixOps[T, BigInt]) = {
+          forAll((positiveLongs, "n")) { (n: Long) =>
+            whenever(n >= 0) {
+              spire.math.fact(n) should equal(fac(n).recurse)
+            }
+          }
+        }
+        "TailRec implementation" in {
+          checkFactorial(Factorial[TailRec])
+        }
+        "Trampoline implementation" in {
+          checkFactorial(Factorial[Trampoline])
         }
       }
     }
