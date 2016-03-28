@@ -85,10 +85,10 @@ object Dependencies {
 
   lazy val numbers: Def.Setting[_] = libraryDependencies ++= Seq(
     `org.spire-math:spire`
-    , `org.apache.spark:spark-core`
-    , `org.apache.spark:spark-streaming`
-    , `org.apache.spark:spark-mllib`
-    , `org.apache.spark:spark-sql`
+    // , `org.apache.spark:spark-core`
+    // , `org.apache.spark:spark-streaming`
+    // , `org.apache.spark:spark-mllib`
+    // , `org.apache.spark:spark-sql`
   )
 
   lazy val overrides: Seq[Setting[_]] = dependencyOverrides ++= Set(

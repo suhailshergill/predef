@@ -16,7 +16,7 @@ lazy val defaultSettings = Defaults.itSettings ++
   Dependencies.overrides ++
   Seq(
     CommonResolvers.settings,
-    Dependencies.base, Dependencies.scalatest,
+    Dependencies.base, Dependencies.scalatest, Dependencies.numbers,
     retrieveManaged := true,
     publishMavenStyle := true,
     conflictManager in ThisBuild := ConflictManager.latestCompatible,
