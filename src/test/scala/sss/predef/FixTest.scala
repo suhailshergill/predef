@@ -95,9 +95,9 @@ class FixTest extends FreeSpec
       }
       "Factorial should calculate n!" - {
         import org.scalacheck._
-        val positiveLongs = for (n <- Gen.choose(0L, 15L)) yield n
+        val nonNegativeLongs = for (n <- Gen.choose(0L, 15L)) yield n
         def checkFactorial[T[_]: Sym](fac: Long => FixOps[T, BigInt]) = {
-          forAll((positiveLongs, "n")) { (n: Long) =>
+          forAll((nonNegativeLongs, "n")) { (n: Long) =>
             whenever(n >= 0) {
               spire.math.fact(n) should equal(fac(n).recurse)
             }
