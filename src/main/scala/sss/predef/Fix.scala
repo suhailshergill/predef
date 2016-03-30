@@ -9,7 +9,8 @@ object Fix {
   import cats._
 
   /**
-    * DSL for defining recursive computations
+    * DSL for defining recursive computations. See 'sss.predef.FixTest' for
+    * example use.
     */
   // <https://github.com/puffnfresh/wartremover/issues/223>. the other option
   // would be to use the equivalent "private[this] val m" instead
@@ -17,7 +18,14 @@ object Fix {
   abstract class Sym[T[_]](implicit m: Monad[T]) extends syntax.AllSyntax { self =>
     type τ[A] = T[A]
 
+    /**
+      * syntax used to denote results corresponding to the base cases in
+      * recursive computations
+      */
     def done[A]: A => τ[A]
+    /**
+      * syntax used to denote recursive cases in a recursive computation
+      */
     def suspend[A](ta: => τ[A]): τ[A]
     /**
       * 'run' is private to ensure that we can control access to
